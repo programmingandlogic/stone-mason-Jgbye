@@ -1,0 +1,87 @@
+package worlds;
+
+import stanford.karel.*;
+public class StoneMasonKarel extends SuperKarel {
+	
+	/*
+	 * checkPillarMod is a modification to
+	 *  checkPillar used only for the last pillar, when
+	 *  the front is blocked. Without this, Karel would
+	 *  get stuck on the last row.
+	 */
+	
+	private void checkPillarMod() {
+		if(frontIsBlocked()) {
+			turnLeft();
+			checkPillar();
+		}
+	}
+	
+	/* nextRow puts down a beeper at the base
+	 * of the pillar (if there is none), then
+	 * moves Karel to the next pillar.
+	 * */
+	
+	private void nextRow() {
+		checkForBeeper();
+		turnLeft();
+		if(frontIsClear()) {
+			move();
+			move();
+			move();
+			move();
+			checkForBeeper();
+		}
+	}
+	
+	/* goBack is run when the front is blocked
+	 * when doing checkPillar. It makes Karel go 
+	 * back from the top to the base of the 
+	 * pillar.
+	 */
+	
+	private void goBack() {
+		while(frontIsClear()) {
+			move();
+		}
+		if(frontIsBlocked()) {
+			nextRow();
+		}
+	}
+	
+	/* What checkPillar does is it moves up the
+	 * pillar, placing beepers where there are none,
+	 * and running goBack when he reaches the top.
+	 */
+	
+	private void checkPillar() { 
+		while(frontIsClear()) {
+			move();
+			checkForBeeper();
+		}
+		if(frontIsBlocked()) {
+			turnLeft();
+			turnLeft();
+			goBack();
+		}
+	}
+	
+	/* checkForBeeper puts a beeper down where
+	 * there are none. It is used when running
+	 * checkWall and at the end of nextRow.
+	 */
+	
+	private void checkForBeeper() {
+		if(noBeepersPresent()) {
+			putBeeper();
+		}
+	}
+	
+	public void run() {
+		while(frontIsClear()) {
+			turnLeft();
+			checkPillar();
+		}
+		checkPillarMod();
+	}
+}
